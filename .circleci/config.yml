@@ -91,7 +91,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run:
+      - run: 
           name: npm run build
           working_directory: ./backend
           command: npm run build
