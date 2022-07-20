@@ -168,7 +168,7 @@ jobs:
 
 
   scan-backend:
-    executor: node
+    executor: node 
     steps:
       - checkout
       - attach_workspace:
@@ -176,10 +176,9 @@ jobs:
       - run:
           name: Check Backend against security vulnerabilities
           working_directory: ./backend
-          command: |
-            npm audit fix --audit-level=critical --force
+          command: 
             npm audit --audit-level=critical
-
+x
 
 
 
