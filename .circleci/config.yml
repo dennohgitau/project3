@@ -165,7 +165,7 @@ jobs:
           command: |
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-            
+
   scan-backend:
     executor: node 
     steps:
@@ -178,6 +178,8 @@ jobs:
           command: |
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+
+
 
 
 
