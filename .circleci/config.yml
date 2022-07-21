@@ -242,10 +242,13 @@ jobs:
             pwd &&
             ls -la
             cat inventory
-            ansible-playbook -i inventory configure-server.yaml
+            ansible-playbook -i inventory configure-server.yml
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
+
+
+
 workflows:
   default:
     jobs:
