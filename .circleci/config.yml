@@ -254,11 +254,8 @@ jobs:
     executor: node
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install AWS CLI dependencies
-          working_directory: /tmp
           command: |
             sudo apt install -y tar gzip curl
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -266,6 +263,8 @@ jobs:
             sudo ./aws/install
       - restore_cache:
           keys: [backend-build]
+      - attach_workspace:
+          at: ~/
       - run:
           name: Run migrations
           command: |
