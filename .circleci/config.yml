@@ -142,6 +142,48 @@ jobs:
             cd backend
             npm install > /dev/null
             npm run test
+   scan-frontend:
+    docker:
+      # Docker image here
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      - attach_workspace:
+          at: ~/
+      # Restore from cache
+      # - restore_cache:
+      #     keys: [frontend-build]
+      # Your job code here
+      - run:
+          name: Analyse frontend
+          command: |
+            cd frontend
+            npm install > /dev/null
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
+  scan-backend:
+    docker:
+      # Docker image here
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      - attach_workspace:
+          at: ~/
+      # Restore from cache
+      # - restore_cache:
+      #     keys: [backend-build]
+      # Your job code here
+      - run:
+          name: Analyse backend
+          command: |
+            cd backend
+            npm install > /dev/null
+            npm update mkdirp --depth 6
+            npm install --save-dev webpack@5.73.0
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
 
 workflows:
   default:
@@ -158,10 +200,10 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
