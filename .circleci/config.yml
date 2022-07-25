@@ -142,7 +142,7 @@ jobs:
             cd backend
             npm install > /dev/null
             npm run test
-   scan-frontend:
+  scan-frontend:
     docker:
       # Docker image here
       - image: circleci/node:13.8.0
