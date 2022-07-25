@@ -255,7 +255,7 @@ jobs:
 
 
 
-   run-migrations:
+  run-migrations:
     executor: node
     steps:
       - checkout
@@ -269,7 +269,7 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-      - run:
+      - run: 
           name: Run migrations
           working_directory: ./backend
           command: |
@@ -290,6 +290,7 @@ jobs:
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
+
 
 
 
