@@ -52,7 +52,8 @@ commands:
             if (($SUCCESS == 1))
             then
               cd ~/project/backend
-              npm install > /dev/null
+              npm install 
+              npm run build
               npm run migrations:revert
             fi
 
@@ -287,36 +288,35 @@ jobs:
       - run:
           name: Install deps
           command: |
-            # yum install tar gzip npm nodejs curl -y
             sudo apt install -y tar gzip curl
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip -qq awscliv2.zip
             sudo ./aws/install
-            # apk add --update --no-cache tar gzip nodejs npm aws-cli curl
-      # - restore_cache:
-      #     keys: [backend-build]
-      - attach_workspace:
-          at: ~/
+      - restore_cache:
+          keys: [backend-build]
+      # - attach_workspace:
+      #     at: ~/
       - run:
           name: Run migrations
           command: |
             # Get DB host from AWS and add to env
-            export TYPEORM_HOST=$(aws cloudformation list-exports --query "Exports[?Name==\`EndpointAddress-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" --output text)
-            echo $TYPEORM_HOST
-            echo TYPEORM_HOST=$TYPEORM_HOST >> ~/project/backend/.env
+            # export TYPEORM_HOST=$(aws cloudformation list-exports --query "Exports[?Name==\`EndpointAddress-${CIRCLE_WORKFLOW_ID:0:7}\`].Value" --output text)
+            # echo $TYPEORM_HOST
+            # echo TYPEORM_HOST=$TYPEORM_HOST >> ~/project/backend/.env
             cd backend
-            # npm install > /dev/null
-            # npm run build > /dev/null
-            npm run migrations >> migrations_dump.txt
-            cat migrations_dump.txt
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend
-      - run:
+            npm install 
+            npm audit fix --audit-level=critical --force
+            npm run build 
+            npm run migrations >> migrations.txt
+            
+      # - persist_to_workspace:
+      #     root: ~/
+      #     paths:
+      #       - project/backend
+      - run: 
           name: Send migration results to kvdb
           command: |
-            if grep -q "has been executed successfully" ~/project/backend/migrations_dump.txt
+            if grep -q "has been executed successfully" ~/project/backend/migrations.txt
             then
               curl --insecure https://kvdb.io/ViWzkdySLpmD9TMMzU5Fzq/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
@@ -324,27 +324,7 @@ jobs:
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  deploy-database:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run: yum install -y tar gzip
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Create database
-          no_output_timeout: 20m
-          command: |
-            export vpcId=$(grep "vpc-id" ~/project/infra.env | cut -d"=" -f2)
-            export subnetId=$(grep "subnet-id" ~/project/infra.env | cut -d"=" -f2)
-            export az=$(grep "az" ~/project/infra.env | cut -d"=" -f2)
-            aws cloudformation deploy --stack-name database-${CIRCLE_WORKFLOW_ID:0:7} \
-              --template-file ~/project/.circleci/files/database.yml \
-              --parameter-overrides DBInstanceID=postgres-${CIRCLE_WORKFLOW_ID:0:7} \
-              WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
-              DBName=$TYPEORM_DATABASE DBUsername=$TYPEORM_USERNAME DBPassword=$TYPEORM_PASSWORD \
-              VPC=$vpcId AZ=$az Subnet=$subnetId
+ 
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
@@ -353,8 +333,8 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - attach_workspace:
-          at: ~/
+      # - attach_workspace:
+      #     at: ~/
       - run:
           name: Install deps
           command: |
@@ -362,7 +342,6 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            # your code here
             export BACKEND_IP=$(aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
@@ -371,18 +350,58 @@ jobs:
             echo "API_URL = ${API_URL}"
             echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
+      - restore_cache:
+          keys: [frontend-build]
+
       - run:
           name: Deploy frontend objects
           command: |
             cd frontend
-            npm install --silent
-            npm run build 2>/dev/null
+            npm install 
+            npm run build 
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist 2>/dev/null
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  
+  deploy-backend:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.10-alpine3.16
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - '2a:89:11:dc:49:f9:58:0b:d0:11:a3:56:fb:1a:0b:32'
+      
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update --no-cache tar gzip nodejs npm aws-cli ansible curl
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm install 
+            npm run build 
+            cd ..
+            tar -C backend -czvf artifact.tar.gz . 
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
+            cd .circleci/ansible
+            cat inventory.txt
+           
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
 
 workflows:
   default:
@@ -416,8 +435,8 @@ workflows:
             - configure-infrastructure
       - deploy-frontend:
           requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend, deploy-database]
       # - cloudfront-update:
