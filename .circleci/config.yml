@@ -255,7 +255,7 @@ jobs:
             cat inventory
             ansible-playbook -i inventory configure-server.yaml
       - destroy-environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
 
   run-migrations:
