@@ -235,46 +235,28 @@ jobs:
       - image: python:3.10-alpine3.16
       # - image: amazon/aws-cli
     steps:
-      # Checkout code from git
       - checkout
-      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints:
-            - '2a:89:11:dc:49:f9:58:0b:d0:11:a3:56:fb:1a:0b:32'
+          fingerprints: ["2a:89:11:dc:49:f9:58:0b:d0:11:a3:56:fb:1a:0b:32"]
+      - attach_workspace:
+          at: .
       - run:
           name: Install dependencies
+          working_directory: ./.circleci/ansible
           command: |
-            apk add --update --no-cache tar gzip ansible aws-cli
-      # attach workspace
-      - attach_workspace:
-          at: ~/
-      # - restore_cache:
-      #     keys: [backend-build]
+            apk add --update ansible
+            ansible --version
       - run:
           name: Configure server
+          working_directory: ./.circleci/ansible
           command: |
-            # add environment variables to server
-            echo NODE_ENV=production > ~/project/backend/.env
-            echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ~/project/backend/.env
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ~/project/backend/.env
-            echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> ~/project/backend/.env
-            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> ~/project/backend/.env
-            echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> ~/project/backend/.env
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ~/project/backend/.env
-            echo TYPEORM_PORT=$TYPEORM_PORT >> ~/project/backend/.env
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ~/project/backend/.env
-            cat ~/project/backend/.env
-            cd ~/project/.circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml \
-            --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde -vvvv
-      # save backend back to workspace
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend
-      # Here's where you will add some code to rollback on failure
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+            pwd &&
+            ls -la
+            cat inventory
+            ansible-playbook -i inventory configure-server.yaml
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
 
   run-migrations:
     docker:
