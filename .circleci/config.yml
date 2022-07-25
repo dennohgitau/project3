@@ -324,6 +324,27 @@ jobs:
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
+  deploy-database:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Create database
+          no_output_timeout: 20m
+          command: |
+            export vpcId=$(grep "vpc-id" ~/project/infra.env | cut -d"=" -f2)
+            export subnetId=$(grep "subnet-id" ~/project/infra.env | cut -d"=" -f2)
+            export az=$(grep "az" ~/project/infra.env | cut -d"=" -f2)
+            aws cloudformation deploy --stack-name database-${CIRCLE_WORKFLOW_ID:0:7} \
+              --template-file ~/project/.circleci/files/database.yml \
+              --parameter-overrides DBInstanceID=postgres-${CIRCLE_WORKFLOW_ID:0:7} \
+              WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
+              DBName=$TYPEORM_DATABASE DBUsername=$TYPEORM_USERNAME DBPassword=$TYPEORM_PASSWORD \
+              VPC=$vpcId AZ=$az Subnet=$subnetId
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
