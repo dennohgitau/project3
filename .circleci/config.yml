@@ -270,7 +270,7 @@ jobs:
           keys: [backend-build]
       - run:
           name: Run migrations
-          command: |
+          command: |      
             cd backend
             npm install
             npm audit fix 
