@@ -85,26 +85,26 @@ jobs:
           paths:
             - project/infra.env
 
-  # deploy-prometheus-monitor:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run: yum install -y tar gzip
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: deploy Prometheus
-  #         command: |
-  #           export vpcId=$(grep "vpc-id" ~/project/infra.env | cut -d"=" -f2)
-  #           export subnetId=$(grep "subnet-id" ~/project/infra.env | cut -d"=" -f2)
-  #           export az=$(grep "az" ~/project/infra.env | cut -d"=" -f2)
-  #           echo $vpcId $az $subnetId
-  #           aws cloudformation deploy --stack-name prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
-  #             --template-file ~/project/.circleci/files/prometheusServer.yml \
-  #             --capabilities CAPABILITY_IAM --parameter-overrides KeyPair=udacity \
-  #             AuthEmail=$AuthEmail EmailPassword=$EmailPassword FromEmail=$FromEmail ToEmail=$ToEmail \
-  #             VPC=$vpcId AZ=$az Subnet=$subnetId
+  deploy-prometheus-monitor:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: deploy Prometheus
+          command: |
+            export vpcId=$(grep "vpc-id" ~/project/infra.env | cut -d"=" -f2)
+            export subnetId=$(grep "subnet-id" ~/project/infra.env | cut -d"=" -f2)
+            export az=$(grep "az" ~/project/infra.env | cut -d"=" -f2)
+            echo $vpcId $az $subnetId
+            aws cloudformation deploy --stack-name prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
+              --template-file ~/project/.circleci/files/prometheusServer.yml \
+              --capabilities CAPABILITY_IAM --parameter-overrides KeyPair=udacity \
+              AuthEmail=$AuthEmail EmailPassword=$EmailPassword FromEmail=$FromEmail ToEmail=$ToEmail \
+              VPC=$vpcId AZ=$az Subnet=$subnetId
 
   deploy-database:
     docker:
@@ -678,11 +678,11 @@ workflows:
           filters:
             branches:
               only: [master, dev-branch]
-      - deploy-prometheus-monitor:
-          requires: [get-aws-params]
-          filters:
-            branches:
-              only: [master, dev-branch]
+      # - deploy-prometheus-monitor:
+      #     requires: [get-aws-params]
+      #     filters:
+      #       branches:
+      #         only: [master, dev-branch]
       - build-frontend:
           filters:
             branches:
