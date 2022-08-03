@@ -679,11 +679,11 @@ workflows:
           filters:
             branches:
               only: [master, dev-branch]
-      - deploy-prometheus-monitor:
-          requires: [get-aws-params]
-          filters:
-            branches:
-              only: [master, dev-branch]
+      # - deploy-prometheus-monitor:
+      #     requires: [get-aws-params]
+      #     filters:
+      #       branches:
+      #         only: [master, dev-branch]
       - build-frontend:
           filters:
             branches:
