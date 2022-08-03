@@ -675,6 +675,7 @@ workflows:
               only: [master, dev-branch]
       - deploy-database:
           requires: [get-aws-params]
+          
           filters:
             branches:
               only: [master, dev-branch]
