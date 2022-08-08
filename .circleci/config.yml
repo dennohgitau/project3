@@ -676,11 +676,11 @@ workflows:
           filters:
             branches:
               only: [master, dev-branch]
-      - deploy-prometheus-monitor:
-          requires: [get-aws-params]
-          filters:
-            branches:
-              only: [master, dev-branch]
+      # - deploy-prometheus-monitor:
+      #     requires: [get-aws-params]
+      #     filters:
+      #       branches:
+      #         only: [master, dev-branch]
       - build-frontend:
           filters:
             branches:
@@ -712,8 +712,8 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend, deploy-database]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend, deploy-database]
       # - cloudfront-update:
       #     requires: [blue-frontend, smoke-test]
       # - add-prometheus-node-exporter:
