@@ -370,7 +370,7 @@ jobs:
 
             cd ~/project/.circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml \
-            --key-file ~/final.pem
+            --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde 
       # save backend back to workspace 
       - persist_to_workspace:
           root: ~/
