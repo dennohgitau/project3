@@ -500,8 +500,7 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-galaxy install weareinteractive.environment
-            ansible-playbook -i inventory.txt deploy-backend.yml \
-            --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde -vvvv
+            ansible-playbook -i inventory.txt deploy-backend.yml 
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
@@ -529,8 +528,7 @@ jobs:
           command: |
             cd .circleci/ansible
             cat inventory.txt
-            ansible-playbook -i inventory.txt node-exporter.yml \
-            --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde -vvvv
+            ansible-playbook -i inventory.txt node-exporter.yml 
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
