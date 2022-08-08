@@ -369,8 +369,7 @@ jobs:
             cat ~/project/backend/.env
 
             cd ~/project/.circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml \
-            --key-file ~/.ssh/id_rsa_ab522568df4c3ad5481855d8f93bdfde 
+            ansible-playbook -i inventory.txt configure-server.yml  
       # save backend back to workspace 
       - persist_to_workspace:
           root: ~/
@@ -706,7 +705,7 @@ workflows:
             branches:
               only: [master, dev-branch]
       - configure-infrastructure:
-          requires: [deploy-infrastructure]
+          # requires: [deploy-infrastructure]
       - run-migrations:
           requires:
             - deploy-database
