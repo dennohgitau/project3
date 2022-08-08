@@ -715,13 +715,14 @@ workflows:
           requires: [deploy-backend, deploy-frontend, deploy-database]
       - cloudfront-update:
           requires: [blue-frontend, smoke-test]
-      - add-prometheus-node-exporter:
-          requires: [smoke-test]
-      - approve:
-          type: approval
-          requires: [cloudfront-update]
+      # - add-prometheus-node-exporter:
+      #     requires: [smoke-test]
+      # - approve:
+      #     type: approval
+      #     requires: [cloudfront-update]
       - cleanup:
-          requires: [approve]
+          # requires: [approve]
+          
       # - destroy-all:
       #     requires:
       #       - blue-frontend
