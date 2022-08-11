@@ -664,71 +664,71 @@ workflows:
           filters:
             branches:
               only: [master, dev-branch]
-      # - blue-frontend:
-      #     requires: [get-aws-params]
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch]
-      # - deploy-database:
-      #     requires: [get-aws-params]
+      - blue-frontend:
+          requires: [get-aws-params]
+          filters:
+            branches:
+              only: [master, dev-branch]
+      - deploy-database:
+          requires: [get-aws-params]
 
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch]
-      # - deploy-prometheus-monitor:
-      #     requires: [get-aws-params]
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch] 
-      # - build-frontend:
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch]
-      # - build-backend:
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch]
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires:
-      #       - deploy-database
-      #       - configure-infrastructure
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend, deploy-database]
-      # - cloudfront-update:
-      #     requires: [blue-frontend, smoke-test]
+          filters:
+            branches:
+              only: [master, dev-branch]
+      - deploy-prometheus-monitor:
+          requires: [get-aws-params]
+          filters:
+            branches:
+              only: [master, dev-branch] 
+      - build-frontend:
+          filters:
+            branches:
+              only: [master, dev-branch]
+      - build-backend:
+          filters:
+            branches:
+              only: [master, dev-branch]
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master, dev-branch]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires:
+            - deploy-database
+            - configure-infrastructure
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend, deploy-database]
+      - cloudfront-update:
+          requires: [blue-frontend, smoke-test]
       - add-prometheus-node-exporter:
           requires: [get-aws-params]
-      # - approve:
-      #     type: approval
-      #     requires: [cloudfront-update]
-      # - cleanup:
-      #     requires: [smoke-test]
+      - approve:
+          type: approval
+          requires: [cloudfront-update]
+      - cleanup:
+          requires: [smoke-test]
           
-      # - destroy-all:
-      #     requires:
-      #       - blue-frontend
-      #       - deploy-database
-      #       - deploy-prometheus-monitor
-      #       - cleanup
-      #     filters:
-      #       branches:
-      #         only: [master, dev-branch]
+      - destroy-all:
+          requires:
+            - blue-frontend
+            - deploy-database
+            - deploy-prometheus-monitor
+            - cleanup
+          filters:
+            branches:
+              only: [master, dev-branch]
