@@ -717,11 +717,11 @@ workflows:
           requires: [blue-frontend, smoke-test]
       - add-prometheus-node-exporter:
           requires: [smoke-test]
-      - approve:
-          type: approval
-          requires: [cloudfront-update]
+      # - approve:
+      #     type: approval
+      #     requires: [cloudfront-update]
       - cleanup:
-          requires: [approve]
+          # requires: [approve]
           
       # - destroy-all:
       #     requires:
