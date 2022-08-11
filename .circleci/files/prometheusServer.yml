@@ -8,7 +8,7 @@ Parameters:
   VPC:
     Description: Deploy the instance in this VPC
     Type: String
-    Default: vpc-0666ab7d6fe9ca219
+    Default: vpc-0a978156e48e35383
   Subnet:
     Description: This subnet must already exist
     Type: String
