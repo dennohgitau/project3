@@ -12,7 +12,7 @@ Parameters:
   Subnet:
     Description: This subnet must already exist
     Type: String
-    Default: subnet-03eb430d72e402806
+    Default: subnet-0d165ad3b8c3faf3e
   AZ:
     Description: Choose an AZ that corresponds to the Subnet in the !Subnet section
     Type: String
