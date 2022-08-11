@@ -107,7 +107,7 @@ Resources:
       ImageId: !Ref Image
       InstanceType: t2.micro
       AvailabilityZone: !Ref AZ # !Select [0, !GetAZs ] # You can manually set an availability zone
-      KeyName: !Ref udacity # udacity # Created with `aws ec2 create-key-pair --key-name udacity >> udacity.pem`
+      KeyName: !Ref vockey # udacity # Created with `aws ec2 create-key-pair --key-name udacity >> udacity.pem`
       NetworkInterfaces:
         - DeviceIndex: 0
           AssociatePublicIpAddress: true
