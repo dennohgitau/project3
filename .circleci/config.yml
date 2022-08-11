@@ -102,7 +102,7 @@ jobs:
             echo $vpcId $az $subnetId
             aws cloudformation deploy --stack-name prometheus-${CIRCLE_WORKFLOW_ID:0:7} \
               --template-file ~/project/.circleci/files/prometheusServer.yml \
-              --capabilities CAPABILITY_IAM --parameter-overrides KeyPair=udacity \
+              --capabilities CAPABILITY_IAM --parameter-overrides KeyPair=vockey \
               AuthEmail=$AuthEmail EmailPassword=$EmailPassword FromEmail=$FromEmail ToEmail=$ToEmail \
               VPC=vpc-0a978156e48e35383 AZ=$az Subnet=subnet-0d165ad3b8c3faf3e
 
