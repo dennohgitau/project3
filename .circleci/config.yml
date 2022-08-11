@@ -679,7 +679,7 @@ workflows:
           requires: [get-aws-params]
           filters:
             branches:
-              only: [master, dev-branch]
+              only: [master, dev-branch] 
       # - build-frontend:
       #     filters:
       #       branches:
