@@ -25,7 +25,7 @@ Parameters:
       where udacity is the name of the KeyPair
       Read more here: https://docs.aws.amazon.com/cli/latest/reference/ec2/create-key-pair.html#examples
     Type: String
-    Default: udacity
+    Default: final
   Image:
     Description: |
       The ID of the AMI (e.g. ami-052efd3df9dad4825 for Ubuntu 20 deployed in us-east-1 )
