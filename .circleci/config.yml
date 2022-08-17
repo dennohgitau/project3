@@ -720,15 +720,15 @@ workflows:
       - approve:
           type: approval
           requires: [cloudfront-update]
-      - cleanup:
-          requires: [smoke-test]
+      # - cleanup:
+      #     requires: [smoke-test]
           
       - destroy-all:
           requires:
             - blue-frontend
             - deploy-database
             - deploy-prometheus-monitor
-            - cleanup
+            # - cleanup
           filters:
             branches:
               only: [master, dev-branch]
